@@ -10,6 +10,14 @@ import "react-datepicker/dist/react-datepicker.css";
 import a_1 from "../assets/images/a_1.png";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import CardList from "./Card/CardList";
+import Shop from "./home/Shop/Shop";
+import { createEvent, getAllEvents } from "../services/eventService"; // Import các hàm API
+import sk1 from "../assets/images/sk1.png";
+import sk2 from "../assets/images/sk2.png";
+import sk3 from "../assets/images/sk3.png";
+import sk4 from "../assets/images/sk4.png";
+import sk5 from "../assets/images/sk5.png";
+import sk6 from "../assets/images/sk6.png";
 
 const SearchBar = () => {
   const [startDate, setStartDate] = useState(null);
@@ -22,6 +30,7 @@ const SearchBar = () => {
   const [eventTitle, setEventTitle] = useState("");
   const [eventDescription, setEventDescription] = useState("");
   const [eventStartDate, setEventStartDate] = useState(null);
+  const [events, setEvents] = useState([]);
 
   const handlePlaceChange = (event) => {
     setPlace(event.target.value);
@@ -43,16 +52,38 @@ const SearchBar = () => {
     setShowForm(true);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Xử lý logic thêm sự kiện ở đây
-    console.log("Form submitted!");
-    console.log("Event Image:", eventImage);
-    console.log("Event Title:", eventTitle);
-    console.log("Event Description:", eventDescription);
-    console.log("Event Start Date:", eventStartDate);
-    setShowForm(false);
+  const fetchEvents = async () => {
+    try {
+      const allEvents = await getAllEvents();
+      setEvents(allEvents);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+    }
   };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const newEvent = {
+      title: eventTitle,
+      description: eventDescription,
+      startDate: eventStartDate,
+      image: eventImage, // Bạn có thể cần xử lý upload hình ảnh riêng
+    };
+    try {
+      const createdEvent = await createEvent(newEvent);
+      console.log("Form submitted!");
+      console.log("Created Event:", createdEvent);
+      setShowForm(false);
+      fetchEvents(); // Refresh events list
+    } catch (error) {
+      console.error("Error creating event:", error);
+    }
+  };
+
+  // Fetch events when component mounts
+  React.useEffect(() => {
+    fetchEvents();
+  }, []);
 
   const defaultTheme = createTheme({
     components: {
@@ -150,15 +181,15 @@ const SearchBar = () => {
   });
 
   return (
-    <div>
-      <div className="flex justify-center items-center h-96">
-        <div className="relative bg-[#242565] rounded-[20px] w-[1086px] h-[140px] shadow-[0px_10px_50px_0px_rgba(61,55,241,0.25)]">
+    <div className="">
+      <div className="flex justify-center items-center">
+        {/* <div className="relative bg-[#00AEFF] rounded-[20px] w-[1086px] h-[140px] shadow-[0px_10px_50px_0px_rgba(61,55,241,0.25)]">
           <div className="absolute w-full h-full flex justify-around items-center">
             <div className="inline-block w-[290px] h-[35px]">
               <input
                 type="text"
                 placeholder="Search Event"
-                className="bg-transparent border-b border-[#ffffff] text-white text-left font-DmSans font-bold text-[22px] w-full outline-none"
+                className="bg-[#00AEFF] border-b border-[#00AEFF] text-white text-left font-DmSans font-bold text-[22px] w-full outline-none"
               />
             </div>
             <ThemeProvider theme={defaultTheme}>
@@ -208,14 +239,14 @@ const SearchBar = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
       <CreateEventSection onCreateEventClick={handleCreateEventClick} />
-      <div className="relative w-full mt-10 flex items-center">
-        <div className="text-[#242565] text-left font-dmSansBold text-[40px] font-bold absolute left-[177px]">
-          Upcoming Events
+      <div className=" w-full mt-10 mb-10 flex justify-between ">
+        <div className="text-[#242565] text-left font-dmSansBold text-[40px] font-bold ml-10  ">
+          CÁC SỰ KIỆN NỔI BẬT
         </div>
-        <div className="flex ml-[1080px] space-x-16">
+        <div className="flex mr-10 space-x-16">
           <ThemeProvider theme={customTheme}>
             <Box sx={{ minWidth: 140 }}>
               <FormControl fullWidth>
@@ -278,19 +309,20 @@ const SearchBar = () => {
           </ThemeProvider>
         </div>
       </div>
-      <CardList />
+      <CardList events={events} /> {/* Truyền các sự kiện vào CardList */}
+      <Shop />
       {showForm && (
         <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
             <div className="p-6">
-              <h2 className="text-2xl font-semibold mb-4">Create Event</h2>
+              <h2 className="text-2xl font-semibold mb-4">Tạo mới sự kiện</h2>
               <form onSubmit={handleSubmit}>
                 <div className="mb-4 flex gap-5">
                   <label
                     htmlFor="eventTitle"
                     className="flex items-center text-sm font-medium text-gray-700 w-1/4"
                   >
-                    Event Title
+                    Tiêu đề sự kiện
                   </label>
                   <input
                     type="text"
@@ -307,7 +339,7 @@ const SearchBar = () => {
                     htmlFor="eventDescription"
                     className="flex items-center text-sm font-medium text-gray-700 w-1/4"
                   >
-                    Event Description
+                    Thông tin sự kiện
                   </label>
                   <textarea
                     id="eventDescription"
@@ -323,12 +355,12 @@ const SearchBar = () => {
                     htmlFor="eventStartDate"
                     className="flex items-center text-sm font-medium text-gray-700 w-1/4"
                   >
-                    Event Start Date
+                    Ngày bắt đầu
                   </label>
                   <DatePicker
                     selected={eventStartDate}
                     onChange={(date) => setEventStartDate(date)}
-                    placeholderText="Select a date"
+                    placeholderText="Chọn ngày diễn ra"
                     className="bg-transparent border-b border-[#000] text-black text-left font-DmSans font-bold text-[16px] w-full outline-none"
                     required
                   />
@@ -338,7 +370,7 @@ const SearchBar = () => {
                     htmlFor="eventImage"
                     className="flex items-center text-sm font-medium text-gray-700 w-1/4"
                   >
-                    Event Image
+                    Hình ảnh sự kiện
                   </label>
                   <input
                     type="file"
@@ -363,13 +395,13 @@ const SearchBar = () => {
                     className="w-full text-[#0adc5d] border rounded-lg text-xl"
                     onClick={() => setShowForm(false)}
                   >
-                    Cancel
+                    Hủy bỏ
                   </button>
                   <button
                     type="submit"
                     className="w-full bg-[#0adc5d] text-white p-2 rounded-lg text-xl"
                   >
-                    Submit
+                    Xác nhận
                   </button>
                 </div>
               </form>
@@ -387,16 +419,13 @@ const CreateEventSection = ({ onCreateEventClick }) => {
       <img className="h-64 w-80" src={a_1} alt="People sitting on a sofa" />
       <div>
         <h2 className="text-4xl font-bold font-DmSans text-gray-900 mb-4">
-          Make your own Event
+          Danh sách sự kiện
         </h2>
-        <p className="text-xl text-gray-600 font-DmSans mb-6">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-        </p>
         <button
-          className="bg-[#000080] text-white font-bold py-2 px-4 w-[182px] h-[60px] text-[16px] cursor-pointer rounded-full shadow-[0_10px_50px_rgba(61,55,241,0.25)] font-DmSans"
+          className="bg-[#393939] text-white font-bold py-2 px-4 w-[182px] h-[60px] text-[16px] cursor-pointer rounded-full shadow-[0_10px_50px_rgba(61,55,241,0.25)] font-DmSans"
           onClick={onCreateEventClick}
         >
-          Create Events
+          Thêm sự kiện
         </button>
       </div>
     </div>
