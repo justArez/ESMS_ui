@@ -126,7 +126,7 @@ const data = [
     image: sk4,
     title: "HỘI THẢO CÔNG NGHỆ 4.0",
     description:
-      "Cập nhật những xu hướng công nghệ mới nhất trong cuộc cách mạng 4.0.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "Cập nhật những xu hướng công nghệ mới nhất trong cuộc cách mạng 4.0.",
     startdate: "AUG 18",
   },
 ];

@@ -329,7 +329,7 @@ const Shop = () => {
 
   return (
     <div className="">
-      <Navbar />
+      {/* <Navbar />
       <div className="slider-container">
         <Swiper
           modules={[Navigation, Pagination]}
@@ -368,7 +368,7 @@ const Shop = () => {
             </div>
           </SwiperSlide>
         </Swiper>
-      </div>
+      </div> */}
       <CreateShopSection onCreateShopClick={handleCreateShopClick} />
       <div className="w-full mt-10 flex justify-center   mb-10">
         <div className="text-[#242565] text-center font-dmSansBold text-[40px] font-bold ">
