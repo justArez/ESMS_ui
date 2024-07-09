@@ -189,7 +189,9 @@ export default function Navbar() {
           className="nav-logo flex flex-row items-center gap-x-4"
           style={{ width: "100px" }}
         >
+
           <a href="/home">
+
             <img className="object-cover" loading="lazy" alt="" src={Logo} />
           </a>
         </div>
@@ -198,6 +200,7 @@ export default function Navbar() {
           className="flex flex-row justify-between items-center gap-x-10 h-menu"
           style={{ fontFamily: "Poppins", fontSize: "20px" }}
         >
+
           {menuItems.map((item, index) => (
             <div
               key={index}
@@ -237,6 +240,25 @@ export default function Navbar() {
             <LogoutIcon />
           </button>
           <PersonIcon />
+          <a href="/Product">
+            <button className="font-semibold">Product</button>
+          </a>
+          <a href="/ListShop">
+            <button className="font-semibold">Shop</button>
+          </a>
+          <a href="/Cart">
+            <button className="font-semibold">Cart</button>
+          </a>
+          <a href="/ListAccounts">
+            <button className="font-semibold">Account</button>
+          </a>
+          <a href="/Payment">
+            {" "}
+            <LogoutIcon />
+          </a>
+          <a href="/Create">
+            <PersonIcon />
+          </a>
         </div>
       </div>
       {openDropdown !== null && (

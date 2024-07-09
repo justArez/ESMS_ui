@@ -729,5 +729,4 @@ export default SalesShopOrder;
 //     </div>
 //   );
 // };
-
 // export default CreateProduct;
