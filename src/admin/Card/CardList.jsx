@@ -173,8 +173,22 @@ import Card from "./Card";
 import "./Card.scss"; // Import the CSS file for styling
 import { getAllEvents } from "../../services/eventService"; // Ensure you have this function in your eventService
 
-const CardList = ({ events, onEditEvent }) => {
+const CardList = ({ onEditEvent, formatDate }) => {
+  const [events, setEvents] = useState([]);
   const [visibleCards, setVisibleCards] = useState(6);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const allEvents = await getAllEvents();
+        setEvents(allEvents);
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      }
+    };
+
+    fetchEvents();
+  }, []);
 
   const loadMore = () => {
     setVisibleCards((prev) => prev + 3);
@@ -190,7 +204,7 @@ const CardList = ({ events, onEditEvent }) => {
               image={item.image}
               title={item.eventName}
               description={item.description}
-              startdate={item.startDate}
+              startdate={formatDate(item.startDate)}
               onEdit={onEditEvent}
             />
           </div>

@@ -683,6 +683,27 @@ const SearchBar = () => {
     },
   });
 
+  const formatDate = (date) => {
+    const monthNames = [
+      "JAN",
+      "FEB",
+      "MAR",
+      "APR",
+      "MAY",
+      "JUN",
+      "JUL",
+      "AUG",
+      "SEP",
+      "OCT",
+      "NOV",
+      "DEC",
+    ];
+    const d = new Date(date);
+    const day = d.getDate();
+    const month = monthNames[d.getMonth()];
+    return `${month} ${day}`;
+  };
+
   return (
     <div className="">
       <CreateEventSection onCreateEventClick={handleCreateEventClick} />
@@ -753,7 +774,11 @@ const SearchBar = () => {
           </ThemeProvider>
         </div>
       </div>
-      <CardList events={events} onEditEvent={handleEditEvent} />
+      <CardList
+        events={events}
+        onEditEvent={handleEditEvent}
+        formatDate={formatDate}
+      />
       <Shop />
       {showForm && (
         <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
