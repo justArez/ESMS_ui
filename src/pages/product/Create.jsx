@@ -323,7 +323,10 @@ const CreateProduct = () => {
                   </h3>
                   <div className="flex justify-between items-center">
                     <p className="text-lg font-semibold mt-3">
-                      {product.price} VND
+                      {product.price.toLocaleString("vi-VN", {
+                        minimumFractionDigits: 0,
+                      })}{" "}
+                      VND
                     </p>
                     <button
                       className="p-2 rounded-md text-sm hover:bg-gray-300 flex items-center justify-center"

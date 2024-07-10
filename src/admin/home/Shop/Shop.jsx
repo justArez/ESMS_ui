@@ -1,19 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { Navigation, Pagination } from "swiper/modules";
-import slider from "../../../assets/images/slider.png";
-import Navbar from "../../Navbar";
 import Footer from "../../../components/Footer";
 import a_1 from "../../../assets/images/a_1.png";
 import "react-datepicker/dist/react-datepicker.css";
-import { MdOutlineAddPhotoAlternate } from "react-icons/md";
 import "./Shop.scss";
 import { RiEditCircleFill } from "react-icons/ri";
-import sk1 from "../../../assets/images/sk1.png";
 
 const Shop = () => {
   const [shops, setShops] = useState([]);
