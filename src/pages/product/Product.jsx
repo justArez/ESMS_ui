@@ -29,7 +29,9 @@ const ProductCart = ({ data }) => {
       />
       <h3 className="text-xl py-3 text-center font-medium mt-6">{name}</h3>
       <div className="flex justify-between items-center w-full">
-        <p className="text-lg font-semibold mt-3">{price} VND</p>
+        <p className="text-lg font-semibold mt-3">
+          {price.toLocaleString("vi-VN", { minimumFractionDigits: 0 })} VND
+        </p>
         <button
           className="p-2 rounded-md text-lg hover:bg-gray-300 flex items-center justify-center"
           onClick={handleAddToCart}
@@ -161,7 +163,14 @@ const SalesShopOrderContent = () => {
                         +
                       </button>
                     </div>
-                    <p>Giá: {product.price * product.quantity} VND</p>
+                    <p>
+                      Giá:{" "}
+                      {(product.price * product.quantity).toLocaleString(
+                        "vi-VN",
+                        { minimumFractionDigits: 0 }
+                      )}{" "}
+                      VND
+                    </p>
                   </div>
                   <button
                     className="bg-red-500 text-white px-2 py-1 rounded-md ml-2"
