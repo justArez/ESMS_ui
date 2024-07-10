@@ -1,92 +1,103 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "./product.scss";
-import Coca from "../../assets/images/Coca.png";
-import Pizza from "../../assets/images/Pizza.png";
-import noodle from "../../assets/images/noodle.png";
-import nuggets from "../../assets/images/nuggets.png";
-import tiramisu from "../../assets/images/tiramisu.png";
-import gimbap from "../../assets/images/gimbap.png";
 import Footer from "../../components/Footer";
 import Navbar from "../../admin/Navbar";
 import PizzaHeader from "../../assets/images/margherita-pizza_3.png";
-import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import { RiEditCircleFill } from "react-icons/ri";
-
-
-const products = [
-  {
-    id: 1,
-    name: "Margherita Pizza",
-    description: "Pizza",
-    price: "49.000 VND",
-    image: Pizza,
-    category: "Food",
-  },
-  {
-    id: 2,
-    name: "Coca Cola",
-    description: "The Origin of Coca-Cola",
-    price: "15.000 VND",
-    image: Coca,
-    category: "Food",
-  },
-  {
-    id: 3,
-    name: "Chicken Nuggets",
-    description: "Fast Food",
-    price: "39.000 VND",
-    image: nuggets,
-    category: "Food",
-  },
-  {
-    id: 4,
-    name: "Noodle",
-    description: "A food in the form of long",
-    price: "29.000 VND",
-    image: noodle,
-    category: "Food",
-  },
-  {
-    id: 5,
-    name: "Tiramisu",
-    description: "Where flavors create a harmonious symphony",
-    price: "19.000 VND",
-    image: tiramisu,
-    category: "Food",
-  },
-  {
-    id: 6,
-    name: "Gimbap",
-    description: "1 Pizza + 1 Coca Cola",
-    price: "45.000 VND",
-    image: gimbap,
-    category: "Food",
-  },
-];
 
 const CreateProduct = () => {
   const [showForm, setShowForm] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
+  const [editProductId, setEditProductId] = useState(null);
+  const [products, setProducts] = useState([]);
   const [productName, setProductName] = useState("");
   const [price, setPrice] = useState("");
   const [productImage, setProductImage] = useState("");
   const [category, setCategory] = useState("");
   const [status, setStatus] = useState("");
   const [description, setDescription] = useState("");
-  const handleSubmit = (e) => {
+  const [quantity, setQuantity] = useState(0);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get(
+        "https://668e540abf9912d4c92dcd67.mockapi.io/Product"
+      );
+      setProducts(response.data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log("Form submitted!");
-    console.log("Product name:", productName);
-    console.log("Price:", price);
-    console.log("Product image:", productImage);
-    console.log("Category:", category);
-    console.log("Status:", status);
-    console.log("Description:", description);
+    try {
+      const newProduct = {
+        name: productName,
+        price: parseInt(price),
+        image: productImage,
+        category,
+        status,
+        description,
+        quantity: parseInt(quantity),
+      };
+
+      if (isEdit) {
+        await axios.put(
+          `https://668e540abf9912d4c92dcd67.mockapi.io/Product/${editProductId}`,
+          newProduct
+        );
+        setIsEdit(false);
+        setEditProductId(null);
+      } else {
+        await axios.post(
+          "https://668e540abf9912d4c92dcd67.mockapi.io/Product",
+          newProduct
+        );
+      }
+
+      fetchProducts();
+      setShowForm(false);
+      clearFormFields();
+    } catch (error) {
+      console.error("Error submitting product:", error);
+    }
   };
 
   const handleCreateProductClick = () => {
     setShowForm(true);
+    setIsEdit(false);
+    clearFormFields();
   };
+
+  const handleEditProductClick = (product) => {
+    setShowForm(true);
+    setIsEdit(true);
+    setEditProductId(product.id);
+    setProductName(product.name);
+    setPrice(product.price);
+    setProductImage(product.image);
+    setCategory(product.category);
+    setStatus(product.status);
+    setDescription(product.description);
+    setQuantity(product.quantity);
+  };
+
+  const clearFormFields = () => {
+    setProductName("");
+    setPrice("");
+    setProductImage("");
+    setCategory("");
+    setStatus("");
+    setDescription("");
+    setQuantity(0);
+  };
+
   return (
     <div>
       <div className="header">
@@ -121,7 +132,6 @@ const CreateProduct = () => {
       </div>
 
       <div className="salesshop-order">
-        {/* other components */}
         <div className="product-list-wrapper">
           <div className="product-list">
             <div className="flex justify-between w-full">
@@ -143,10 +153,10 @@ const CreateProduct = () => {
                 <div className="bg-white p-6 rounded-lg shadow-lg relative w-1/2 max-w-lg">
                   <div className="p-6">
                     <h2 className="text-2xl font-semibold mb-4 text-center">
-                      Tạo mới sản phẩm
+                      {isEdit ? "Chỉnh sửa sản phẩm" : "Tạo mới sản phẩm"}
                     </h2>
                     <form onSubmit={handleSubmit}>
-                      <div className="mb-4 flex items-center ">
+                      <div className="mb-4 flex items-center">
                         <label
                           htmlFor="productName"
                           className="text-sm font-medium text-gray-700 w-1/4"
@@ -180,6 +190,23 @@ const CreateProduct = () => {
                           required
                         />
                       </div>
+                      <div className="mb-4 flex items-center">
+                        <label
+                          htmlFor="quantity"
+                          className="text-sm font-medium text-gray-700 w-1/4"
+                        >
+                          Số lượng
+                        </label>
+                        <input
+                          type="number"
+                          id="quantity"
+                          name="quantity"
+                          value={quantity}
+                          onChange={(e) => setQuantity(e.target.value)}
+                          className="mt-1 border border-gray-300 rounded-md w-3/4"
+                          required
+                        />
+                      </div>
                       <div className="border-b-2 mb-4"></div>
                       <div className="mb-4 flex items-center">
                         <label
@@ -189,19 +216,15 @@ const CreateProduct = () => {
                           Hình ảnh sản phẩm
                         </label>
                         <input
-                          type="file"
+                          type="text"
                           id="productImage"
                           name="productImage"
-                          className="hidden"
-                          accept="image/*"
+                          value={productImage}
+                          onChange={(e) => setProductImage(e.target.value)}
+                          placeholder="Nhập liên kết hình ảnh"
+                          className="mt-1 border border-gray-300 rounded-md w-3/4"
                           required
                         />
-                        <label
-                          htmlFor="productImage"
-                          className="cursor-pointer p-2 border border-gray-300 rounded-md w-3/4 flex items-center justify-center"
-                        >
-                          <AddPhotoAlternateIcon />
-                        </label>
                       </div>
                       <div className="border-b-2 mb-4"></div>
                       <div className="mb-4 flex items-center">
@@ -300,9 +323,12 @@ const CreateProduct = () => {
                   </h3>
                   <div className="flex justify-between items-center">
                     <p className="text-lg font-semibold mt-3">
-                      {product.price}
+                      {product.price} VND
                     </p>
-                    <button className="p-2 rounded-md text-sm hover:bg-gray-300 flex items-center justify-center">
+                    <button
+                      className="p-2 rounded-md text-sm hover:bg-gray-300 flex items-center justify-center"
+                      onClick={() => handleEditProductClick(product)}
+                    >
                       <span className="text-2xl font-medium">
                         <RiEditCircleFill />
                       </span>
