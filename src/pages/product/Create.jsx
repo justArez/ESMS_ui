@@ -5,6 +5,9 @@ import Footer from "../../components/Footer";
 import Navbar from "../../admin/Navbar";
 import PizzaHeader from "../../assets/images/margherita-pizza_3.png";
 import { RiEditCircleFill } from "react-icons/ri";
+import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import { storage } from "../../firebaseConfig"; // Correct path to firebaseConfig.js
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage"; // Import necessary Firebase Storage functions
 
 const CreateProduct = () => {
   const [showForm, setShowForm] = useState(false);
@@ -13,11 +16,13 @@ const CreateProduct = () => {
   const [products, setProducts] = useState([]);
   const [productName, setProductName] = useState("");
   const [price, setPrice] = useState("");
-  const [productImage, setProductImage] = useState("");
+  const [productImage, setProductImage] = useState(null);
+  const [productImageUrl, setProductImageUrl] = useState("");
   const [category, setCategory] = useState("");
   const [status, setStatus] = useState("");
   const [description, setDescription] = useState("");
   const [quantity, setQuantity] = useState(0);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const fetchProducts = async () => {
     try {
@@ -34,13 +39,40 @@ const CreateProduct = () => {
     fetchProducts();
   }, []);
 
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const storageRef = ref(storage, `product_images/${file.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
+          setUploadProgress(progress);
+          console.log(`Upload is ${progress}% done`);
+        },
+        (error) => {
+          console.error("Upload error:", error);
+        },
+        async () => {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          setProductImageUrl(downloadURL);
+        }
+      );
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       const newProduct = {
         name: productName,
         price: parseInt(price),
-        image: productImage,
+        image: productImageUrl,
         category,
         status,
         description,
@@ -81,7 +113,7 @@ const CreateProduct = () => {
     setEditProductId(product.id);
     setProductName(product.name);
     setPrice(product.price);
-    setProductImage(product.image);
+    setProductImageUrl(product.image);
     setCategory(product.category);
     setStatus(product.status);
     setDescription(product.description);
@@ -91,11 +123,13 @@ const CreateProduct = () => {
   const clearFormFields = () => {
     setProductName("");
     setPrice("");
-    setProductImage("");
+    setProductImage(null);
+    setProductImageUrl("");
     setCategory("");
     setStatus("");
     setDescription("");
     setQuantity(0);
+    setUploadProgress(0);
   };
 
   return (
@@ -216,16 +250,30 @@ const CreateProduct = () => {
                           Hình ảnh sản phẩm
                         </label>
                         <input
-                          type="text"
-                          id="productImage"
-                          name="productImage"
-                          value={productImage}
-                          onChange={(e) => setProductImage(e.target.value)}
-                          placeholder="Nhập liên kết hình ảnh"
-                          className="mt-1 border border-gray-300 rounded-md w-3/4"
-                          required
+                          type="file"
+                          id="eventImage"
+                          name="eventImage"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                          accept="image/*"
                         />
+                        <label
+                          htmlFor="eventImage"
+                          className="cursor-pointer p-2 border border-gray-300 rounded-md w-3/4 text-center hover:bg-gray-100 transition duration-300"
+                        >
+                          <AddPhotoAlternateIcon />
+                        </label>
                       </div>
+                      {uploadProgress > 0 && (
+                        <div className="w-full bg-gray-200 rounded-full mt-2">
+                          <div
+                            className="bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full"
+                            style={{ width: `${uploadProgress}%` }}
+                          >
+                            {uploadProgress}%
+                          </div>
+                        </div>
+                      )}
                       <div className="border-b-2 mb-4"></div>
                       <div className="mb-4 flex items-center">
                         <label
