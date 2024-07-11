@@ -21,6 +21,7 @@ import Shop from "./admin/home/Shop/Shop";
 import EventDetails from "./components/eventDetails/EventDetails";
 import { CartProvider } from "./pages/product/CartContext";
 import DashboardVendor from "./pages/VendorDashboard/VendorDashboard";
+import SalesShopOrder from "./pages/product/Product";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/home" element={<Homepage />} />
         <Route path="/shop" element={<Shop />} />
+        <Route path="/shop/:shopId/products" element={<SalesShopOrder />} />
         <Route path="/ListAccounts" element={<ListAccounts />} />
         <Route path="/ListCards" element={<ListCards />} />
         <Route path="/ListOrders" element={<ListOrders />} />

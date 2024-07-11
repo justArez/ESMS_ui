@@ -11,10 +11,12 @@ import { RiEditCircleFill } from "react-icons/ri";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import { storage } from "../../../firebaseConfig"; // Correct path to firebaseConfig.js
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage"; // Import necessary Firebase Storage functions
+import { useNavigate } from "react-router-dom";
 
 const Shop = () => {
   const [shops, setShops] = useState([]);
   const [editingShop, setEditingShop] = useState(null);
+  const navigate = useNavigate();
 
   const fetchShops = async () => {
     try {
@@ -69,6 +71,10 @@ const Shop = () => {
     });
   };
 
+  const handleSelectShop = (shopId) => {
+    navigate(`/shop/${shopId}/products`);
+  };
+
   return (
     <div className="">
       <CreateShopSection onCreateShopClick={handleCreateShopClick} />
@@ -79,7 +85,12 @@ const Shop = () => {
       </div>
       <div className="shop-list">
         {shops.map((shop) => (
-          <ShopItem key={shop.id} item={shop} onEdit={handleEdit} />
+          <ShopItem
+            key={shop.id}
+            item={shop}
+            onEdit={handleEdit}
+            onSelect={handleSelectShop}
+          />
         ))}
       </div>
       {editingShop && (
@@ -94,11 +105,11 @@ const Shop = () => {
   );
 };
 
-const ShopItem = ({ item, onEdit }) => {
+const ShopItem = ({ item, onEdit, onSelect }) => {
   const { id, image, title, description } = item;
 
   return (
-    <div className="shop-item">
+    <div className="shop-item" onClick={() => onSelect(id)}>
       <div className="shop-item-img-container">
         <img className="shop-item-image" src={image} alt={title} />
       </div>
@@ -111,7 +122,10 @@ const ShopItem = ({ item, onEdit }) => {
         <div className="shop-item-desc">
           <RiEditCircleFill
             className="shop-item-button"
-            onClick={() => onEdit(item)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(item);
+            }}
           ></RiEditCircleFill>
           <p>{description}</p>
         </div>
