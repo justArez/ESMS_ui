@@ -229,9 +229,9 @@
 
 // export default PaymentOrder;
 
-import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { useCart } from "./CartContext"; // Đảm bảo đường dẫn đúng
+import React, { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useCart } from "./CartContext";
 import "./product.scss";
 import qr_code from "../../assets/images/qr_code.png";
 import Navbar from "../../admin/Navbar";
@@ -244,15 +244,18 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 const PaymentOrder = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPaymentSuccessful, setIsPaymentSuccessful] = useState(false);
-  const { cart, incrementQuantity, decrementQuantity, removeItem } = useCart();
+  const { cart, incrementQuantity, decrementQuantity, removeItem, saveCart } =
+    useCart();
   const navigate = useNavigate();
-  const { shopId } = useParams(); // Lấy shopId từ URL
+  const location = useLocation();
+  const shopId = location.state?.shopId;
 
   const handleCheckoutClick = () => {
     setIsModalOpen(true);
   };
 
   const handleConfirmPaymentClick = () => {
+    saveCart();
     setIsModalOpen(false);
     setIsPaymentSuccessful(true);
   };
@@ -262,20 +265,28 @@ const PaymentOrder = () => {
   };
 
   const handleBackClick = () => {
-    navigate(`/shop/${shopId}/products`); // Điều hướng về trang sản phẩm của shop
+    if (shopId) {
+      navigate(`/shop/${shopId}/products`);
+    }
+  };
+
+  const handleAddMoreProductsClick = () => {
+    if (shopId) {
+      navigate(`/shop/${shopId}/products`);
+    }
   };
 
   return (
     <div>
-      <div className="header">
+      <div className="header ">
         <Navbar />
         <div className="flex flex-row py-4 justify-between relative">
           <div className="h-bot flex flex-col items-start px-20">
             <h1>
               <span className="h-title">
-                <p
-                  style={{ fontFamily: "Poppins, sans-serif" }}
-                >{`CHÀO MỪNG ĐẾN VỚI `}</p>
+                <p style={{ fontFamily: "Poppins, sans-serif" }}>
+                  CHÀO MỪNG ĐẾN VỚI
+                </p>
                 <p className="mt-1">FEV - SHOP</p>
               </span>
             </h1>
@@ -292,6 +303,7 @@ const PaymentOrder = () => {
               <b>TẠO ĐƠN HÀNG</b>
             </button>
           </div>
+
           <div className="flex relative">
             <div className="white-blur"></div>
             <img
@@ -305,7 +317,7 @@ const PaymentOrder = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white p-6">
+        <div className="bg-white p-6 ">
           <div className="flex items-center mb-4">
             <button onClick={handleBackClick} className="mr-2">
               <ArrowBackIcon />
@@ -320,7 +332,7 @@ const PaymentOrder = () => {
             {cart.map((product, index) => (
               <div
                 key={index}
-                className="card-product flex justify-between items-center p-10 gap-10 rounded-lg bg-white shadow"
+                className="card-product flex justify-between items-center p-10 gap-10 rounded-lg  bg-white shadow"
               >
                 <img src={product.image} alt={product.name} className="w-32" />
                 <div className="flex flex-col items-start ml-4">
@@ -345,16 +357,22 @@ const PaymentOrder = () => {
               </div>
             ))}
           </ul>
+          <button
+            className="bg-blue-500 text-white py-2 px-4 rounded-md mt-4"
+            onClick={handleAddMoreProductsClick}
+          >
+            Thêm sản phẩm
+          </button>
         </div>
 
-        <div className="p-20 rounded-3xl max-h-20">
+        <div className="p-20 rounded-3xl max-h-20 ">
           <div className="p-6 rounded-lg shadow-md bg-[#00AEFF] text-white font-semibold">
             <h1 className="text-5xl font-semibold mb-6 text-white">
               Thông tin đơn hàng
             </h1>
             <form className="flex flex-col space-y-4 text-xl">
               <div className="flex flex-col mb-4">
-                <label htmlFor="username" className="text-white font-medium">
+                <label htmlFor="username" className="text-white font-medium ">
                   Tên khách hàng
                 </label>
                 <input
