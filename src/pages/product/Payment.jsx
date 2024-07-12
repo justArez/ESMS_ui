@@ -230,8 +230,8 @@
 // export default PaymentOrder;
 
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useCart } from "./CartContext"; // Đảm bảo đường dẫn đúng
+import { useLocation, useNavigate } from "react-router-dom";
+import { useCart } from "./CartContext";
 import "./product.scss";
 import qr_code from "../../assets/images/qr_code.png";
 import Navbar from "../../admin/Navbar";
@@ -244,14 +244,18 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 const PaymentOrder = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPaymentSuccessful, setIsPaymentSuccessful] = useState(false);
-  const { cart, incrementQuantity, decrementQuantity, removeItem } = useCart();
+  const { cart, incrementQuantity, decrementQuantity, removeItem, saveCart } =
+    useCart();
   const navigate = useNavigate();
+  const location = useLocation();
+  const shopId = location.state?.shopId;
 
   const handleCheckoutClick = () => {
     setIsModalOpen(true);
   };
 
   const handleConfirmPaymentClick = () => {
+    saveCart();
     setIsModalOpen(false);
     setIsPaymentSuccessful(true);
   };
@@ -261,7 +265,15 @@ const PaymentOrder = () => {
   };
 
   const handleBackClick = () => {
-    navigate("/product");
+    if (shopId) {
+      navigate(`/shop/${shopId}/products`);
+    }
+  };
+
+  const handleAddMoreProductsClick = () => {
+    if (shopId) {
+      navigate(`/shop/${shopId}/products`);
+    }
   };
 
   return (
@@ -272,9 +284,9 @@ const PaymentOrder = () => {
           <div className="h-bot flex flex-col items-start px-20">
             <h1>
               <span className="h-title">
-                <p
-                  style={{ fontFamily: "Poppins, sans-serif" }}
-                >{`CHÀO MỪNG ĐẾN VỚI `}</p>
+                <p style={{ fontFamily: "Poppins, sans-serif" }}>
+                  CHÀO MỪNG ĐẾN VỚI
+                </p>
                 <p className="mt-1">FEV - SHOP</p>
               </span>
             </h1>
@@ -345,6 +357,12 @@ const PaymentOrder = () => {
               </div>
             ))}
           </ul>
+          <button
+            className="bg-blue-500 text-white py-2 px-4 rounded-md mt-4"
+            onClick={handleAddMoreProductsClick}
+          >
+            Thêm sản phẩm
+          </button>
         </div>
 
         <div className="p-20 rounded-3xl max-h-20 ">
