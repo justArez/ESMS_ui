@@ -1,23 +1,22 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { Navigation, Pagination } from "swiper/modules";
-import slider from "../../../assets/images/slider.png";
-import Navbar from "../../Navbar";
 import Footer from "../../../components/Footer";
 import a_1 from "../../../assets/images/a_1.png";
 import "react-datepicker/dist/react-datepicker.css";
-import { MdOutlineAddPhotoAlternate } from "react-icons/md";
 import "./Shop.scss";
 import { RiEditCircleFill } from "react-icons/ri";
-import sk1 from "../../../assets/images/sk1.png";
+import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import { storage } from "../../../firebaseConfig"; // Correct path to firebaseConfig.js
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage"; // Import necessary Firebase Storage functions
+import { useNavigate } from "react-router-dom";
 
 const Shop = () => {
   const [shops, setShops] = useState([]);
   const [editingShop, setEditingShop] = useState(null);
+  const navigate = useNavigate();
 
   const fetchShops = async () => {
     try {
@@ -72,6 +71,10 @@ const Shop = () => {
     });
   };
 
+  const handleSelectShop = (shopId) => {
+    navigate(`/shop/${shopId}/products`);
+  };
+
   return (
     <div className="">
       <CreateShopSection onCreateShopClick={handleCreateShopClick} />
@@ -82,7 +85,12 @@ const Shop = () => {
       </div>
       <div className="shop-list">
         {shops.map((shop) => (
-          <ShopItem key={shop.id} item={shop} onEdit={handleEdit} />
+          <ShopItem
+            key={shop.id}
+            item={shop}
+            onEdit={handleEdit}
+            onSelect={handleSelectShop}
+          />
         ))}
       </div>
       {editingShop && (
@@ -97,11 +105,11 @@ const Shop = () => {
   );
 };
 
-const ShopItem = ({ item, onEdit }) => {
+const ShopItem = ({ item, onEdit, onSelect }) => {
   const { id, image, title, description } = item;
 
   return (
-    <div className="shop-item">
+    <div className="shop-item" onClick={() => onSelect(id)}>
       <div className="shop-item-img-container">
         <img className="shop-item-image" src={image} alt={title} />
       </div>
@@ -114,7 +122,10 @@ const ShopItem = ({ item, onEdit }) => {
         <div className="shop-item-desc">
           <RiEditCircleFill
             className="shop-item-button"
-            onClick={() => onEdit(item)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(item);
+            }}
           ></RiEditCircleFill>
           <p>{description}</p>
         </div>
@@ -124,10 +135,37 @@ const ShopItem = ({ item, onEdit }) => {
 };
 
 const ShopForm = ({ item, onSave, onCancel }) => {
-  const { id, image, title, description } = item;
+  const { id, title, description, image } = item;
   const [shopTitle, setShopTitle] = useState(title || "");
   const [shopDescription, setShopDescription] = useState(description || "");
   const [shopImage, setShopImage] = useState(image || "");
+  const [shopImageUrl, setShopImageUrl] = useState(image || "");
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const storageRef = ref(storage, `shop_images/${file.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
+          setUploadProgress(progress);
+        },
+        (error) => {
+          console.error("Upload error:", error);
+        },
+        async () => {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          setShopImageUrl(downloadURL);
+        }
+      );
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -135,7 +173,7 @@ const ShopForm = ({ item, onSave, onCancel }) => {
       ...item,
       title: shopTitle,
       description: shopDescription,
-      image: shopImage,
+      image: shopImageUrl,
     });
   };
 
@@ -185,18 +223,27 @@ const ShopForm = ({ item, onSave, onCancel }) => {
                 htmlFor="shopImage"
                 className="flex items-center text-sm font-medium text-gray-700 w-1/4"
               >
-                Link hình ảnh
+                Hình ảnh cửa hàng
               </label>
               <input
-                type="text"
+                type="file"
                 id="shopImage"
                 name="shopImage"
-                value={shopImage}
-                onChange={(e) => setShopImage(e.target.value)}
+                onChange={handleImageUpload}
                 className="mt-1 border border-gray-300 rounded-md w-full"
-                required
+                accept="image/*"
               />
             </div>
+            {uploadProgress > 0 && (
+              <div className="w-full bg-gray-200 rounded-full mt-2">
+                <div
+                  className="bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full"
+                  style={{ width: `${uploadProgress}%` }}
+                >
+                  {uploadProgress}%
+                </div>
+              </div>
+            )}
             <div className="border-b mb-4"></div>
             <div className="flex justify-end gap-5">
               <button

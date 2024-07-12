@@ -1,6 +1,6 @@
 import axios from "axios";
 
-axios.defaults.baseURL = "https://66598fc6de346625136cf421.mockapi.io/";
+axios.defaults.baseURL = "https://668e540abf9912d4c92dcd67.mockapi.io/";
 axios.defaults.headers.post["Content-Type"] = "application/json";
 axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
 axios.defaults.headers.delete["Access-Control-Allow-Origin"] = "*";

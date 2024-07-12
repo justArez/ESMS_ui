@@ -15,12 +15,20 @@
 // import PizzaHeader from "../../assets/images/margherita-pizza_3.png";
 // import DeleteIcon from "@mui/icons-material/Delete";
 // import Navbar from "../../admin/Navbar";
+// import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+// import CloseIcon from "@mui/icons-material/Close";
 
 // const PaymentOrder = () => {
 //   const [isModalOpen, setIsModalOpen] = useState(false);
+//   const [isPaymentSuccessful, setIsPaymentSuccessful] = useState(false);
 
 //   const handleCheckoutClick = () => {
 //     setIsModalOpen(true);
+//   };
+
+//   const handleConfirmPaymentClick = () => {
+//     setIsModalOpen(false);
+//     setIsPaymentSuccessful(true);
 //   };
 
 //   const handleCloseModal = () => {
@@ -67,7 +75,7 @@
 //         </div>
 //       </div>
 
-//       <div className=" grid grid-cols-1 lg:grid-cols-2 gap-8">
+//       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 //         <div className="bg-white p-6 ">
 //           <h2 className="text-2xl font-semibold mb-4">Đơn hàng của bạn</h2>
 //           <h3>
@@ -83,35 +91,35 @@
 //               </div>
 //               <span className="text-lg">1</span>
 //               <div className="flex flex-col items-end">
-//                 <span className="text-base">49.000 VND</span>
+//                 <span className="text-base">10.000 VND</span>
 //               </div>
 //               <span>
 //                 <DeleteIcon />
 //               </span>
 //             </div>
 //             <div className="card-product flex justify-between items-center p-10 gap-10 rounded-lg  bg-white shadow">
-//               <img src={Pizza} alt="" className="w-32" />
+//               <img src={Coca} alt="" className="w-32" />
 //               <div className="flex flex-col items-start ml-4">
-//                 <span className="text-base font-bold">Pizza</span>
-//                 <span className="text-sm">Food</span>
+//                 <span className="text-base font-bold">Coca Cola</span>
+//                 <span className="text-sm">Drink</span>
 //               </div>
 //               <span className="text-lg">1</span>
 //               <div className="flex flex-col items-end">
-//                 <span className="text-base">49.000 VND</span>
+//                 <span className="text-base">10.000 VND</span>
 //               </div>
 //               <span>
 //                 <DeleteIcon />
 //               </span>
 //             </div>
 //             <div className="card-product flex justify-between items-center p-10 gap-10 rounded-lg  bg-white shadow">
-//               <img src={Pizza} alt="" className="w-32" />
+//               <img src={noodle} alt="" className="w-32" />
 //               <div className="flex flex-col items-start ml-4">
-//                 <span className="text-base font-bold">Pizza</span>
+//                 <span className="text-base font-bold">Noodle</span>
 //                 <span className="text-sm">Food</span>
 //               </div>
 //               <span className="text-lg">1</span>
 //               <div className="flex flex-col items-end">
-//                 <span className="text-base">49.000 VND</span>
+//                 <span className="text-base">10.000 VND</span>
 //               </div>
 //               <span>
 //                 <DeleteIcon />
@@ -126,8 +134,6 @@
 //               Thông tin đơn hàng
 //             </h1>
 //             <form className="flex flex-col space-y-4 text-xl">
-//               {" "}
-//               {/* Thay đổi từ space-y-2 thành space-y-4 */}
 //               <div className="flex flex-col mb-4">
 //                 <label htmlFor="username" className="text-white font-medium ">
 //                   Tên khách hàng
@@ -155,31 +161,14 @@
 //                   className="mt-1 p-2 border bg-[#C5E3FF] rounded-md font-semibold text-black"
 //                 />
 //               </div>
-//               {/* <div className="flex flex-col mb-4">
-//                 <label htmlFor="balance" className="font-medium text-white">
-//                   Balance
-//                 </label>
-//                 <input
-//                   type="text"
-//                   id="balance"
-//                   name="balance"
-//                   placeholder="Enter your balance"
-//                   className="mt-1 p-2 border bg-[#C5E3FF] rounded-md font-semibold text-black"
-//                 />
-//               </div> */}
-//               <div className="border-b border-gray-300 mb-4"></div>{" "}
-//               {/* Thêm margin-bottom */}
+//               <div className="border-b border-gray-300 mb-4"></div>
 //               <div className="flex justify-between mb-4">
-//                 {" "}
-//                 {/* Thêm margin-bottom */}
 //                 <p>3 sản phẩm</p>
-//                 <p> 119.000 VNĐ </p>
+//                 <p> 30.000 VNĐ </p>
 //               </div>
 //               <div className="flex justify-between mb-4">
-//                 {" "}
-//                 {/* Thêm margin-bottom */}
 //                 <p>Tổng cộng</p>
-//                 <p> 119.000 VNĐ </p>
+//                 <p> 30.000 VNĐ </p>
 //               </div>
 //               <div className="flex justify-between mb-4">
 //                 <button
@@ -199,11 +188,36 @@
 //       {isModalOpen && (
 //         <div className="modal-overlay">
 //           <div className="modal">
-//             <h2>QR Code</h2>
-//             <img src={qr_code} alt="QR Code" />
-//             <button onClick={handleCloseModal} className="close-modal">
-//               Thành công
+//             <button onClick={handleCloseModal} className="close-icon">
+//               <CloseIcon />
 //             </button>
+//             <h2 className="font-bold">QR Code</h2>
+//             <img src={qr_code} alt="QR Code" />
+//             <button
+//               onClick={handleConfirmPaymentClick}
+//               className="bg-[#0ADC5D] text-white font-bold"
+//             >
+//               THANH TOÁN
+//             </button>
+//           </div>
+//         </div>
+//       )}
+
+//       {isPaymentSuccessful && (
+//         <div className="modal-overlay">
+//           <div className="modal success-modal">
+//             <button
+//               onClick={() => setIsPaymentSuccessful(false)}
+//               className="close-icon"
+//             >
+//               <CloseIcon />
+//             </button>
+//             <div className="success-content">
+//               <CheckCircleIcon
+//                 style={{ color: "#0ADC5D", fontSize: "100px" }}
+//               />
+//             </div>
+//             <h2 className="success-text font-bold">THANH TOÁN THÀNH CÔNG</h2>
 //           </div>
 //         </div>
 //       )}
@@ -216,28 +230,22 @@
 // export default PaymentOrder;
 
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useCart } from "./CartContext"; // Đảm bảo đường dẫn đúng
 import "./product.scss";
-import Coca from "../../assets/images/Coca.png";
-import Pizza from "../../assets/images/Pizza.png";
-import noodle from "../../assets/images/noodle.png";
-import nuggets from "../../assets/images/nuggets.png";
-import tiramisu from "../../assets/images/tiramisu.png";
-import gimbap from "../../assets/images/gimbap.png";
 import qr_code from "../../assets/images/qr_code.png";
-// import Hero from "../hero/Hero";
-import Footer from "../../components/Footer";
-import Logo from "../../assets/images/esms 4.png";
-import LogoutIcon from "@mui/icons-material/Logout";
-import PersonIcon from "@mui/icons-material/Person";
-import PizzaHeader from "../../assets/images/margherita-pizza_3.png";
-import DeleteIcon from "@mui/icons-material/Delete";
 import Navbar from "../../admin/Navbar";
+import PizzaHeader from "../../assets/images/margherita-pizza_3.png";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 const PaymentOrder = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPaymentSuccessful, setIsPaymentSuccessful] = useState(false);
+  const { cart, incrementQuantity, decrementQuantity, removeItem } = useCart();
+  const navigate = useNavigate();
 
   const handleCheckoutClick = () => {
     setIsModalOpen(true);
@@ -250,6 +258,10 @@ const PaymentOrder = () => {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+  };
+
+  const handleBackClick = () => {
+    navigate("/product");
   };
 
   return (
@@ -294,54 +306,44 @@ const PaymentOrder = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white p-6 ">
-          <h2 className="text-2xl font-semibold mb-4">Đơn hàng của bạn</h2>
+          <div className="flex items-center mb-4">
+            <button onClick={handleBackClick} className="mr-2">
+              <ArrowBackIcon />
+            </button>
+            <h2 className="text-2xl font-semibold">Đơn hàng của bạn</h2>
+          </div>
           <h3>
-            Bạn có <span style={{ color: "#0adc5d" }}>3</span> sản phẩm trong
-            giỏ hàng
+            Bạn có <span style={{ color: "#0adc5d" }}>{cart.length}</span> sản
+            phẩm trong giỏ hàng
           </h3>
           <ul>
-            <div className="card-product flex justify-between items-center p-10 gap-10 rounded-lg  bg-white shadow">
-              <img src={Pizza} alt="" className="w-32" />
-              <div className="flex flex-col items-start ml-4">
-                <span className="text-base font-bold">Pizza</span>
-                <span className="text-sm">Food</span>
+            {cart.map((product, index) => (
+              <div
+                key={index}
+                className="card-product flex justify-between items-center p-10 gap-10 rounded-lg  bg-white shadow"
+              >
+                <img src={product.image} alt={product.name} className="w-32" />
+                <div className="flex flex-col items-start ml-4">
+                  <span className="text-base font-bold">{product.name}</span>
+                  <span className="text-sm">{product.category}</span>
+                </div>
+                <span className="text-lg">{product.quantity}</span>
+                <div className="flex flex-col items-end">
+                  <span className="text-base">
+                    {(product.price * product.quantity).toLocaleString(
+                      "vi-VN",
+                      {
+                        minimumFractionDigits: 0,
+                      }
+                    )}{" "}
+                    VND
+                  </span>
+                </div>
+                <span onClick={() => removeItem(product.id)}>
+                  <DeleteIcon />
+                </span>
               </div>
-              <span className="text-lg">1</span>
-              <div className="flex flex-col items-end">
-                <span className="text-base">10.000 VND</span>
-              </div>
-              <span>
-                <DeleteIcon />
-              </span>
-            </div>
-            <div className="card-product flex justify-between items-center p-10 gap-10 rounded-lg  bg-white shadow">
-              <img src={Coca} alt="" className="w-32" />
-              <div className="flex flex-col items-start ml-4">
-                <span className="text-base font-bold">Coca Cola</span>
-                <span className="text-sm">Drink</span>
-              </div>
-              <span className="text-lg">1</span>
-              <div className="flex flex-col items-end">
-                <span className="text-base">10.000 VND</span>
-              </div>
-              <span>
-                <DeleteIcon />
-              </span>
-            </div>
-            <div className="card-product flex justify-between items-center p-10 gap-10 rounded-lg  bg-white shadow">
-              <img src={noodle} alt="" className="w-32" />
-              <div className="flex flex-col items-start ml-4">
-                <span className="text-base font-bold">Noodle</span>
-                <span className="text-sm">Food</span>
-              </div>
-              <span className="text-lg">1</span>
-              <div className="flex flex-col items-end">
-                <span className="text-base">10.000 VND</span>
-              </div>
-              <span>
-                <DeleteIcon />
-              </span>
-            </div>
+            ))}
           </ul>
         </div>
 
@@ -380,12 +382,28 @@ const PaymentOrder = () => {
               </div>
               <div className="border-b border-gray-300 mb-4"></div>
               <div className="flex justify-between mb-4">
-                <p>3 sản phẩm</p>
-                <p> 30.000 VNĐ </p>
+                <p>{cart.length} sản phẩm</p>
+                <p>
+                  {cart
+                    .reduce(
+                      (total, item) => total + item.price * item.quantity,
+                      0
+                    )
+                    .toLocaleString("vi-VN", { minimumFractionDigits: 0 })}{" "}
+                  VNĐ
+                </p>
               </div>
               <div className="flex justify-between mb-4">
                 <p>Tổng cộng</p>
-                <p> 30.000 VNĐ </p>
+                <p>
+                  {cart
+                    .reduce(
+                      (total, item) => total + item.price * item.quantity,
+                      0
+                    )
+                    .toLocaleString("vi-VN", { minimumFractionDigits: 0 })}{" "}
+                  VNĐ
+                </p>
               </div>
               <div className="flex justify-between mb-4">
                 <button
@@ -438,8 +456,6 @@ const PaymentOrder = () => {
           </div>
         </div>
       )}
-
-      <Footer />
     </div>
   );
 };
