@@ -1,8 +1,4 @@
-import { width } from "@mui/system";
-import CardEvent from "./CardEvent";
-import Button from "@mui/material/Button";
-import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
@@ -11,8 +7,18 @@ import Select from "@mui/material/Select";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import {
+  createEvent,
+  getAllEvents,
+  updateEvent,
+} from "../../../services/eventService";
+import CardList from "../../../admin/Card/CardList";
 
-export default function EventsManagement() {
+import { storage } from "../../../firebaseConfig"; // Import storage từ firebaseConfig
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage"; // Import cần thiết từ Firebase Storage
+
+const EventsManagement = () => {
   const [startDate, setStartDate] = useState(null);
   const [place, setPlace] = useState("");
   const [weekday, setWeekday] = useState("");
@@ -23,6 +29,9 @@ export default function EventsManagement() {
   const [eventTitle, setEventTitle] = useState("");
   const [eventDescription, setEventDescription] = useState("");
   const [eventStartDate, setEventStartDate] = useState(null);
+  const [events, setEvents] = useState([]);
+  const [editingEvent, setEditingEvent] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const handlePlaceChange = (event) => {
     setPlace(event.target.value);
@@ -41,52 +50,252 @@ export default function EventsManagement() {
   };
 
   const handleCreateEventClick = () => {
+    setEditingEvent(null);
+    setEventTitle("");
+    setEventDescription("");
+    setEventStartDate(null);
+    setEventImage(null);
     setShowForm(true);
   };
 
-  const handleSubmit = (e) => {
+  const fetchEvents = async () => {
+    try {
+      const allEvents = await getAllEvents();
+      setEvents(allEvents);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Xử lý logic thêm sự kiện ở đây
-    console.log("Form submitted!");
-    console.log("Event Image:", eventImage);
-    console.log("Event Title:", eventTitle);
-    console.log("Event Description:", eventDescription);
-    console.log("Event Start Date:", eventStartDate);
-    setShowForm(false);
+
+    if (eventImage) {
+      const storageRef = ref(storage, `images/${eventImage.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, eventImage);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
+          setUploadProgress(progress);
+          console.log(`Upload is ${progress}% done`);
+        },
+        (error) => {
+          console.error("Upload error:", error);
+        },
+        async () => {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          const newEvent = {
+            eventName: eventTitle,
+            description: eventDescription,
+            startDate: eventStartDate,
+            image: downloadURL,
+          };
+          try {
+            if (editingEvent) {
+              const updatedEvent = await updateEvent(editingEvent.id, newEvent);
+              console.log("Event updated:", updatedEvent);
+            } else {
+              const createdEvent = await createEvent(newEvent);
+              console.log("Event created:", createdEvent);
+            }
+            setShowForm(false);
+            fetchEvents(); // Refresh the event list
+          } catch (error) {
+            console.error("Error saving event:", error);
+          }
+        }
+      );
+    } else {
+      const newEvent = {
+        eventName: eventTitle,
+        description: eventDescription,
+        startDate: eventStartDate,
+        image: null,
+      };
+      try {
+        if (editingEvent) {
+          const updatedEvent = await updateEvent(editingEvent.id, newEvent);
+          console.log("Event updated:", updatedEvent);
+        } else {
+          const createdEvent = await createEvent(newEvent);
+          console.log("Event created:", createdEvent);
+        }
+        setShowForm(false);
+        fetchEvents();
+      } catch (error) {
+        console.error("Error saving event:", error);
+      }
+    }
   };
-  const CreateEventSection = ({ onCreateEventClick }) => {
-    return (
-      <div className="0">
-        <button
-          className="bg-[#393939] text-white font-bold py-2 px-4 w-[182px] h-[60px] text-[16px] cursor-pointer rounded-full shadow-[0_10px_50px_rgba(61,55,241,0.25)] font-DmSans"
-          onClick={onCreateEventClick}
-        >
-          Thêm sự kiện
-        </button>
-      </div>
-    );
+
+  const handleEditEvent = (event) => {
+    setEditingEvent(event);
+    setEventTitle(event.eventName);
+    setEventDescription(event.description);
+    setEventStartDate(new Date(event.startDate));
+    setEventImage(event.image);
+    setShowForm(true);
   };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setEventImage(file);
+    }
+  };
+
+  const defaultTheme = createTheme({
+    components: {
+      MuiSelect: {
+        styleOverrides: {
+          select: {
+            color: "white",
+            "&.MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: "transparent",
+              },
+              "&:hover fieldset": {
+                borderColor: "transparent",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "transparent",
+              },
+            },
+          },
+          icon: {
+            color: "white",
+          },
+        },
+      },
+      MuiMenuItem: {
+        styleOverrides: {
+          root: {
+            "&.Mui-selected": {
+              backgroundColor: "navy",
+              color: "white",
+            },
+            "&.Mui-selected:hover": {
+              backgroundColor: "darkblue",
+            },
+          },
+        },
+      },
+      MuiInputLabel: {
+        styleOverrides: {
+          root: {
+            color: "lightblue",
+          },
+        },
+      },
+    },
+  });
+
+  const customTheme = createTheme({
+    components: {
+      MuiSelect: {
+        styleOverrides: {
+          select: {
+            backgroundColor: "#F2F3FC",
+            borderRadius: "12px",
+            padding: "10px 16px",
+            "&:hover": {
+              backgroundColor: "#EDEFF9",
+            },
+            "&.Mui-focused": {
+              backgroundColor: "#EDEFF9",
+            },
+            "& .MuiOutlinedInput-notchedOutline": {
+              border: "none",
+            },
+          },
+          icon: {
+            color: "#242565",
+          },
+        },
+      },
+      MuiInputLabel: {
+        styleOverrides: {
+          root: {
+            color: "#242565",
+            fontSize: "14px",
+            fontWeight: "bold",
+            top: "-4px",
+          },
+        },
+      },
+      MuiMenuItem: {
+        styleOverrides: {
+          root: {
+            "&.Mui-selected": {
+              backgroundColor: "#D6D8F2",
+              color: "#242565",
+            },
+            "&.Mui-selected:hover": {
+              backgroundColor: "#C2C4E6",
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const formatDate = (date) => {
+    const monthNames = [
+      "JAN",
+      "FEB",
+      "MAR",
+      "APR",
+      "MAY",
+      "JUN",
+      "JUL",
+      "AUG",
+      "SEP",
+      "OCT",
+      "NOV",
+      "DEC",
+    ];
+    const d = new Date(date);
+    const day = d.getDate();
+    const month = monthNames[d.getMonth()];
+    return `${month} ${day}`;
+  };
+
   return (
-    <div>
-      <div className="flex justify-between">
-        <h1 className="text-2xl mb-4 text-start font-bold">Quản lí Sự kiện</h1>
+    <div className="">
+      <div className="w-full mt-10 mb-10 flex justify-between">
+        <div className="text-[#242565] text-center font-dmSansBold text-[40px] font-bold ml-10">
+          CÁC SỰ KIỆN NỔI BẬT
+        </div>
         <CreateEventSection onCreateEventClick={handleCreateEventClick} />
       </div>
-      <div className="">
-        <CardEvent style={{ width: "50%" }} />
-      </div>
+      <CardList
+        events={events}
+        onEditEvent={handleEditEvent}
+        formatDate={formatDate}
+      />
+
       {showForm && (
         <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
             <div className="p-6">
-              <h2 className="text-2xl font-semibold mb-4">Tạo sự kiện</h2>
+              <h2 className="text-2xl font-semibold mb-4">
+                {editingEvent ? "Chỉnh sửa sự kiện" : "Tạo mới sự kiện"}
+              </h2>
               <form onSubmit={handleSubmit}>
                 <div className="mb-4 flex gap-5">
                   <label
                     htmlFor="eventTitle"
                     className="flex items-center text-sm font-medium text-gray-700 w-1/4"
                   >
-                    Tên sự kiện:
+                    Tiêu đề sự kiện
                   </label>
                   <input
                     type="text"
@@ -103,7 +312,7 @@ export default function EventsManagement() {
                     htmlFor="eventDescription"
                     className="flex items-center text-sm font-medium text-gray-700 w-1/4"
                   >
-                    Tiêu đề:
+                    Thông tin sự kiện
                   </label>
                   <textarea
                     id="eventDescription"
@@ -119,12 +328,12 @@ export default function EventsManagement() {
                     htmlFor="eventStartDate"
                     className="flex items-center text-sm font-medium text-gray-700 w-1/4"
                   >
-                    Ngày bắt đầu:
+                    Ngày bắt đầu
                   </label>
                   <DatePicker
                     selected={eventStartDate}
                     onChange={(date) => setEventStartDate(date)}
-                    placeholderText="Select a date"
+                    placeholderText="Chọn ngày diễn ra"
                     className="bg-transparent border-b border-[#000] text-black text-left font-DmSans font-bold text-[16px] w-full outline-none"
                     required
                   />
@@ -134,16 +343,15 @@ export default function EventsManagement() {
                     htmlFor="eventImage"
                     className="flex items-center text-sm font-medium text-gray-700 w-1/4"
                   >
-                    Ảnh:
+                    Hình ảnh sự kiện
                   </label>
                   <input
                     type="file"
                     id="eventImage"
                     name="eventImage"
-                    onChange={(e) => setEventImage(e.target.files[0])}
+                    onChange={handleImageChange}
                     className="hidden"
                     accept="image/*"
-                    required
                   />
                   <label
                     htmlFor="eventImage"
@@ -152,6 +360,16 @@ export default function EventsManagement() {
                     <AddPhotoAlternateIcon />
                   </label>
                 </div>
+                {uploadProgress > 0 && (
+                  <div className="w-full bg-gray-200 rounded-full">
+                    <div
+                      className="bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full"
+                      style={{ width: `${uploadProgress}%` }}
+                    >
+                      {uploadProgress}%
+                    </div>
+                  </div>
+                )}
                 <div className="border-b mb-4"></div>
                 <div className="flex justify-end gap-5">
                   <button
@@ -159,13 +377,13 @@ export default function EventsManagement() {
                     className="w-full text-[#0adc5d] border rounded-lg text-xl"
                     onClick={() => setShowForm(false)}
                   >
-                    Hủy
+                    Hủy bỏ
                   </button>
                   <button
                     type="submit"
                     className="w-full bg-[#0adc5d] text-white p-2 rounded-lg text-xl"
                   >
-                    Tạo
+                    Xác nhận
                   </button>
                 </div>
               </form>
@@ -175,4 +393,21 @@ export default function EventsManagement() {
       )}
     </div>
   );
-}
+};
+
+const CreateEventSection = ({ onCreateEventClick }) => {
+  return (
+    <div className="">
+      <div>
+        <button
+          className="bg-[#393939] text-white font-bold py-2 px-4 w-[182px] h-[60px] text-[16px] cursor-pointer rounded-full shadow-[0_10px_50px_rgba(61,55,241,0.25)] font-DmSans"
+          onClick={onCreateEventClick}
+        >
+          Thêm sự kiện
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default EventsManagement;
