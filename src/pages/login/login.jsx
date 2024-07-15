@@ -1,5 +1,5 @@
 // LoginComponent.js
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { login } from "./api";
@@ -21,6 +21,10 @@ const Login = () => {
     e.preventDefault();
     try {
       const user = await login(username, password);
+      if (user.status === "Inactive") {
+        setError("Tài khoản của bạn đã bị khóa.");
+        return;
+      }
       if (
         (isHost && user.role === "host") ||
         (!isHost && user.role === "vendor")
@@ -34,7 +38,7 @@ const Login = () => {
         setError("Invalid role for this login form.");
       }
     } catch (error) {
-      setError(error.message);
+      setError("Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.");
     }
   };
 
