@@ -261,52 +261,54 @@ const SalesShopOrderContent = ({ shopId, shopName }) => {
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-5 rounded-lg shadow-lg max-w-lg w-full">
             <h2 className="text-2xl font-bold mb-4">Giỏ Hàng</h2>
-            <ul>
-              {cart.map((product, index) => (
-                <li
-                  key={index}
-                  className="mb-2 flex items-center justify-between"
-                >
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-16 h-16 object-cover rounded-md mr-4"
-                  />
-                  <div className="flex-1">
-                    <p className="font-bold">{product.name}</p>
-                    <div className="flex items-center">
-                      <button
-                        className="bg-gray-300 px-2 rounded"
-                        onClick={() => decrementQuantity(product.id)}
-                      >
-                        -
-                      </button>
-                      <span className="mx-2">{product.quantity}</span>
-                      <button
-                        className="bg-gray-300 px-2 rounded"
-                        onClick={() => incrementQuantity(product.id)}
-                      >
-                        +
-                      </button>
-                    </div>
-                    <p>
-                      Giá:{" "}
-                      {(product.price * product.quantity).toLocaleString(
-                        "vi-VN",
-                        { minimumFractionDigits: 0 }
-                      )}{" "}
-                      VND
-                    </p>
-                  </div>
-                  <button
-                    className="bg-red-500 text-white px-2 py-1 rounded-md ml-2"
-                    onClick={() => removeItem(product.id)}
+            <div className="cart-items overflow-y-auto max-h-96">
+              <ul>
+                {cart.map((product, index) => (
+                  <li
+                    key={index}
+                    className="mb-2 flex items-center justify-between"
                   >
-                    <DeleteIcon />
-                  </button>
-                </li>
-              ))}
-            </ul>
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-16 h-16 object-cover rounded-md mr-4"
+                    />
+                    <div className="flex-1">
+                      <p className="font-bold">{product.name}</p>
+                      <div className="flex items-center">
+                        <button
+                          className="bg-gray-300 px-2 rounded"
+                          onClick={() => decrementQuantity(product.id)}
+                        >
+                          -
+                        </button>
+                        <span className="mx-2">{product.quantity}</span>
+                        <button
+                          className="bg-gray-300 px-2 rounded"
+                          onClick={() => incrementQuantity(product.id)}
+                        >
+                          +
+                        </button>
+                      </div>
+                      <p>
+                        Giá:{" "}
+                        {(product.price * product.quantity).toLocaleString(
+                          "vi-VN",
+                          { minimumFractionDigits: 0 }
+                        )}{" "}
+                        VND
+                      </p>
+                    </div>
+                    <button
+                      className="bg-red-500 text-white px-2 py-1 rounded-md ml-2"
+                      onClick={() => removeItem(product.id)}
+                    >
+                      <DeleteIcon />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
             <div className="mt-4 text-center">
               <p className="font-bold">
                 Tổng cộng:{" "}

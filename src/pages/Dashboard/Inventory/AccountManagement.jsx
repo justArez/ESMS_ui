@@ -44,6 +44,7 @@ export default function AccountManagement() {
     username: "",
     password: "",
     role: "vendor",
+    status: "Inactive",
   });
 
   useEffect(() => {
