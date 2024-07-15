@@ -290,10 +290,10 @@ const CreateProduct = () => {
                           className="mt-1 p-2 border border-gray-300 rounded-md w-3/4 text-sm"
                           required
                         >
-                          <option value="">Select a category</option>
-                          <option value="Food">Food</option>
-                          <option value="Drink">Drink</option>
-                          <option value="Snack">Snack</option>
+                          <option value="">Loại sản phẩm</option>
+                          <option value="Food">Thức ăn</option>
+                          <option value="Drink">Nước uống</option>
+                          <option value="Snack">Thức ăn nhanh</option>
                         </select>
                       </div>
                       <div className="mb-4 flex items-center">

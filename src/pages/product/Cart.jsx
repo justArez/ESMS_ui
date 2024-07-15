@@ -1,88 +1,104 @@
-import React, { useState } from "react";
-import "./product.scss";
-import Coca from "../../assets/images/Coca.png";
-import Pizza from "../../assets/images/Pizza.png";
-import noodle from "../../assets/images/noodle.png";
-import nuggets from "../../assets/images/nuggets.png";
-import tiramisu from "../../assets/images/tiramisu.png";
-import gimbap from "../../assets/images/gimbap.png";
-import Footer from "../../components/Footer";
-import Logo from "../../assets/images/esms 4.png";
-import LogoutIcon from "@mui/icons-material/Logout";
-import PersonIcon from "@mui/icons-material/Person";
-import PizzaHeader from "../../assets/images/margherita-pizza_3.png";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import "./product.scss";
 import Navbar from "../../admin/Navbar";
-
-const products = [
-  {
-    id: 1,
-    name: "Margherita Pizza",
-    description:
-      "Made with San Marzano tomatoes, mozzarella cheese, and fresh basil.",
-    price: "49.000 VND",
-    image: Pizza,
-    category: "Thực phẩm",
-  },
-  {
-    id: 2,
-    name: "Coca Cola",
-    description: "The Origin of Coca-Cola",
-    price: "15.000 VND",
-    image: Coca,
-    category: "Nước giải khát",
-  },
-  {
-    id: 3,
-    name: "Chicken Nuggets",
-    description: "Fast Thực phẩm",
-    price: "39.000 VND",
-    image: nuggets,
-    category: "Thực phẩm",
-  },
-  {
-    id: 4,
-    name: "Noodle",
-    description: "A Thực phẩm in the form of long",
-    price: "29.000 VND",
-    image: noodle,
-    category: "Thực phẩm",
-  },
-  {
-    id: 5,
-    name: "Tiramisu",
-    description: "Where flavors create a harmonious symphony",
-    price: "19.000 VND",
-    image: tiramisu,
-    category: "Thực phẩm",
-  },
-  {
-    id: 6,
-    name: "Gimbap",
-    description: "1 Pizza + 1 Coca Cola",
-    price: "45.000 VND",
-    image: gimbap,
-    category: "Thực phẩm",
-  },
-];
+import Footer from "../../components/Footer";
+import PizzaHeader from "../../assets/images/margherita-pizza_3.png";
+import { useParams } from "react-router-dom";
 
 const CartProduct = () => {
+  const [orders, setOrders] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [totalRevenue, setTotalRevenue] = useState(0);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const { shopId } = useParams();
+  const [shopName, setShopName] = useState("");
+
+  useEffect(() => {
+    console.log("shopId:", shopId);
+    if (shopId) {
+      fetchShopName();
+      fetchOrders();
+    }
+  }, [startDate, endDate, shopId]);
+
+  const fetchShopName = async () => {
+    try {
+      const response = await axios.get(
+        `https://668e540abf9912d4c92dcd67.mockapi.io/Shop/1/Product/${shopId}`
+      );
+      setShopName(response.data.title);
+    } catch (error) {
+      console.error("Error fetching shop name:", error);
+    }
+  };
+
+  const fetchOrders = async () => {
+    try {
+      const response = await axios.get(
+        `https://668e540abf9912d4c92dcd67.mockapi.io/Shop/1/Product/${shopId}/orders`
+      );
+      console.log("Fetched orders:", response.data);
+      if (response.data && Array.isArray(response.data)) {
+        const filteredOrders = filterOrdersByDate(response.data);
+        setOrders(filteredOrders);
+        calculateProductStatistics(filteredOrders);
+      } else {
+        console.error("Invalid data format:", response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  };
+
+  const filterOrdersByDate = (orders) => {
+    if (!startDate || !endDate) return orders;
+
+    return orders.filter((order) => {
+      const orderDate = new Date(order.time);
+      return orderDate >= startDate && orderDate <= endDate;
+    });
+  };
+
+  const calculateProductStatistics = (orders) => {
+    const productStatistics = {};
+    let total = 0;
+
+    orders.forEach((order) => {
+      if (order.products && Array.isArray(order.products)) {
+        order.products.forEach((product) => {
+          if (!productStatistics[product.id]) {
+            productStatistics[product.id] = {
+              ...product,
+              totalQuantity: 0,
+            };
+          }
+          productStatistics[product.id].totalQuantity += product.quantity;
+          total += product.price * product.quantity;
+        });
+      }
+    });
+
+    console.log("Product statistics:", productStatistics);
+    setProducts(Object.values(productStatistics));
+    setTotalRevenue(total);
+  };
 
   return (
     <div>
-      <div className="header ">
+      <div className="header">
         <Navbar />
         <div className="flex flex-row py-4 justify-between relative">
           <div className="h-bot flex flex-col items-start px-20">
             <h1>
               <span className="h-title">
-                <p
-                  style={{ fontFamily: "Poppins, sans-serif" }}
-                >{`CHÀO MỪNG ĐẾN VỚI `}</p>
-                <p className="mt-1">FEV - SHOP</p>
+                <p style={{ fontFamily: "Poppins, sans-serif" }}>
+                  CHÀO MỪNG ĐẾN VỚI
+                </p>
+                <p className="mt-1">{shopName} - SHOP</p>
               </span>
             </h1>
             <h3
@@ -91,13 +107,6 @@ const CartProduct = () => {
             >
               Vị ngon trên từng hương vị.
             </h3>
-            <button
-              className="bg-[#00AEFF] text-white py-5 px-10 rounded-full tracking-widest mt-8"
-              style={{ fontSize: "24px", marginRight: "475px" }}
-            >
-              <b>TẠO ĐƠN HÀNG</b>
-
-            </button>
           </div>
           <div className="flex relative">
             <div className="white-blur"></div>
@@ -146,38 +155,34 @@ const CartProduct = () => {
           </div>
         </div>
 
-        <div className="flex justify-end text-xl text-[#00AEFF] font-bold   pr-36 pb-20">
-          <h3>TỔNG DOANH THU: 119.000 VND</h3>
+        <div className="flex justify-end text-xl text-[#00AEFF] font-bold pr-36 pb-20">
+          <h3>TỔNG DOANH THU: {totalRevenue.toLocaleString("vi-VN")} VND</h3>
         </div>
         <div className="table-container flex justify-center text-center ">
           <table className="product-table ">
             <thead>
               <tr>
-                <th>
-                  <input type="checkbox" />
-                </th>
                 <th>STT</th>
                 <th>Tên sản phẩm</th>
                 <th>Hình ảnh</th>
                 <th>Thông tin chi tiết</th>
                 <th className="centered-column">Loại sản phẩm</th>
                 <th>Số lượng</th>
+                <th>Giá</th>
               </tr>
             </thead>
             <tbody>
               {products.map((product, index) => (
                 <tr key={index}>
-                  <td>
-                    <input type="checkbox" />
-                  </td>
-                  <td>{product.id}</td>
+                  <td>{index + 1}</td>
                   <td>{product.name}</td>
                   <td>
                     <img src={product.image} alt={product.name} />
                   </td>
                   <td>{product.description}</td>
                   <td className="centered-column">{product.category}</td>
-                  <td>{product.quantity}</td>
+                  <td>{product.totalQuantity}</td>
+                  <td>{product.price.toLocaleString("vi-VN")} VND</td>
                 </tr>
               ))}
             </tbody>

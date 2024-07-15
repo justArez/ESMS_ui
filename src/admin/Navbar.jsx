@@ -65,7 +65,7 @@ export default function Navbar() {
     {
       title: "ĐƠN HÀNG",
       subItems: [
-        { name: "Doanh thu", url: "Cart" },
+        // { name: "Doanh thu", url: "Cart" },
         { name: "Thanh toán", url: "/Payment" },
         { name: "Sản phẩm đã bán", url: "/Cart" },
       ],
