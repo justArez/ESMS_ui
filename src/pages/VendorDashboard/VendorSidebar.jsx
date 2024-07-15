@@ -14,9 +14,12 @@ import DraftsIcon from "@mui/icons-material/Drafts";
 import SendIcon from "@mui/icons-material/Send";
 import EventIcon from "@mui/icons-material/Event";
 import InventoryIcon from "@mui/icons-material/Inventory";
+import { useNavigate } from "react-router-dom";
 import "./sidebar.scss";
 
 export default function Sidebar({ setActiveComponent }) {
+  const navigate = useNavigate();
+
   const icons = [
     AttachMoneyIcon,
     InventoryIcon,
@@ -40,8 +43,14 @@ export default function Sidebar({ setActiveComponent }) {
         display: "flex",
         flexDirection: "column",
         border: "none",
+        cursor: "pointer", // Add cursor pointer
+        "&:hover": {
+          // Add hover effect
+          backgroundColor: "#1e293b",
+        },
       }}
       role="presentation"
+      onClick={() => navigate("/home")}
     >
       <div
         className="nav-logo flex justify-center p-6"
@@ -56,7 +65,10 @@ export default function Sidebar({ setActiveComponent }) {
           return (
             <ListItem key={text} disablePadding>
               <ListItemButton
-                onClick={() => setActiveComponent(component)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveComponent(component);
+                }}
                 sx={{
                   "&:hover": {
                     backgroundColor: "#2c394f",
@@ -88,14 +100,7 @@ export default function Sidebar({ setActiveComponent }) {
   );
 
   return (
-    <Box
-      sx={{
-        "&:hover": {
-          backgroundColor: "#1e293b",
-        },
-        transition: "background-color 0.3s",
-      }}
-    >
+    <Box>
       <Drawer
         variant="permanent"
         sx={{

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { CartProvider, useCart } from "./CartContext";
+import { useCart } from "./CartContext";
 import axios from "axios";
 import "./product.scss";
 import Footer from "../../components/Footer";
@@ -12,7 +12,7 @@ import Navbar from "../../admin/Navbar";
 import { useParams, useNavigate } from "react-router-dom";
 import { RiEditCircleFill } from "react-icons/ri";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { storage } from "../../firebaseConfig"; // Ensure this path is correct
+import { storage } from "../../firebaseConfig";
 
 const ProductCart = ({ data, onEdit }) => {
   const { image, name, price } = data;
@@ -54,7 +54,7 @@ const ProductCart = ({ data, onEdit }) => {
   );
 };
 
-const SalesShopOrderContent = ({ shopId }) => {
+const SalesShopOrderContent = ({ shopId, shopName }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [products, setProducts] = useState([]);
   const { cart, incrementQuantity, decrementQuantity, removeItem } = useCart();
@@ -197,7 +197,7 @@ const SalesShopOrderContent = ({ shopId }) => {
                 <p
                   style={{ fontFamily: "Poppins, sans-serif" }}
                 >{`CHÀO MỪNG ĐẾN VỚI`}</p>
-                <p className="mt-1">FEV - SHOP</p>
+                <p className="mt-1">{shopName} - SHOP</p>
               </span>
             </h1>
             <h3
@@ -206,16 +206,6 @@ const SalesShopOrderContent = ({ shopId }) => {
             >
               Vị ngon trên từng hương vị.
             </h3>
-            <div className="flex gap-5">
-              <button
-                className="add-to-cart-wrapper mt-2 bg-blue-500 text-white text-sm p-2 rounded hover:bg-blue-600 transition duration-300"
-                onClick={handleCreateProductClick}
-              >
-                <div className="add-to-cart" style={{ fontSize: "bold" }}>
-                  Thêm sản phẩm
-                </div>
-              </button>
-            </div>
           </div>
           <div className="flex relative">
             <div className="white-blur"></div>
@@ -236,7 +226,15 @@ const SalesShopOrderContent = ({ shopId }) => {
         >
           sản phẩm
         </div>
-        <div className="absolute top-14 right-20">
+        <div className="absolute top-14 right-20 flex items-center space-x-4">
+          <button
+            className="add-to-cart-wrapper bg-blue-500 text-white text-sm p-2 rounded hover:bg-blue-600 transition duration-300"
+            onClick={handleCreateProductClick}
+          >
+            <div className="add-to-cart" style={{ fontSize: "bold" }}>
+              Thêm sản phẩm
+            </div>
+          </button>
           <button className="relative" onClick={() => setShowPopup(!showPopup)}>
             <ShoppingCartCheckoutIcon fontSize="large" />
             {cart.length > 0 && (
@@ -263,52 +261,54 @@ const SalesShopOrderContent = ({ shopId }) => {
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-5 rounded-lg shadow-lg max-w-lg w-full">
             <h2 className="text-2xl font-bold mb-4">Giỏ Hàng</h2>
-            <ul>
-              {cart.map((product, index) => (
-                <li
-                  key={index}
-                  className="mb-2 flex items-center justify-between"
-                >
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-16 h-16 object-cover rounded-md mr-4"
-                  />
-                  <div className="flex-1">
-                    <p className="font-bold">{product.name}</p>
-                    <div className="flex items-center">
-                      <button
-                        className="bg-gray-300 px-2 rounded"
-                        onClick={() => decrementQuantity(product.id)}
-                      >
-                        -
-                      </button>
-                      <span className="mx-2">{product.quantity}</span>
-                      <button
-                        className="bg-gray-300 px-2 rounded"
-                        onClick={() => incrementQuantity(product.id)}
-                      >
-                        +
-                      </button>
-                    </div>
-                    <p>
-                      Giá:{" "}
-                      {(product.price * product.quantity).toLocaleString(
-                        "vi-VN",
-                        { minimumFractionDigits: 0 }
-                      )}{" "}
-                      VND
-                    </p>
-                  </div>
-                  <button
-                    className="bg-red-500 text-white px-2 py-1 rounded-md ml-2"
-                    onClick={() => removeItem(product.id)}
+            <div className="cart-items overflow-y-auto max-h-96">
+              <ul>
+                {cart.map((product, index) => (
+                  <li
+                    key={index}
+                    className="mb-2 flex items-center justify-between"
                   >
-                    <DeleteIcon />
-                  </button>
-                </li>
-              ))}
-            </ul>
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-16 h-16 object-cover rounded-md mr-4"
+                    />
+                    <div className="flex-1">
+                      <p className="font-bold">{product.name}</p>
+                      <div className="flex items-center">
+                        <button
+                          className="bg-gray-300 px-2 rounded"
+                          onClick={() => decrementQuantity(product.id)}
+                        >
+                          -
+                        </button>
+                        <span className="mx-2">{product.quantity}</span>
+                        <button
+                          className="bg-gray-300 px-2 rounded"
+                          onClick={() => incrementQuantity(product.id)}
+                        >
+                          +
+                        </button>
+                      </div>
+                      <p>
+                        Giá:{" "}
+                        {(product.price * product.quantity).toLocaleString(
+                          "vi-VN",
+                          { minimumFractionDigits: 0 }
+                        )}{" "}
+                        VND
+                      </p>
+                    </div>
+                    <button
+                      className="bg-red-500 text-white px-2 py-1 rounded-md ml-2"
+                      onClick={() => removeItem(product.id)}
+                    >
+                      <DeleteIcon />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
             <div className="mt-4 text-center">
               <p className="font-bold">
                 Tổng cộng:{" "}
@@ -446,10 +446,10 @@ const SalesShopOrderContent = ({ shopId }) => {
                     className="mt-1 p-2 border border-gray-300 rounded-md w-3/4 text-sm"
                     required
                   >
-                    <option value="">Select a category</option>
-                    <option value="Food">Food</option>
-                    <option value="Drink">Drink</option>
-                    <option value="Snack">Snack</option>
+                    <option value="">Loại sản phẩm</option>
+                    <option value="Food">Thức ăn</option>
+                    <option value="Drink">Nước uống</option>
+                    <option value="Snack">Thức ăn nhanh</option>
                   </select>
                 </div>
                 <div className="mb-4 flex items-center">
@@ -515,12 +515,26 @@ const SalesShopOrderContent = ({ shopId }) => {
 
 const SalesShopOrder = () => {
   const { shopId } = useParams();
+  const [shopName, setShopName] = useState("");
 
-  return (
-    <CartProvider>
-      <SalesShopOrderContent shopId={shopId} />
-    </CartProvider>
-  );
+  useEffect(() => {
+    const fetchShopName = async () => {
+      try {
+        const response = await axios.get(
+          `https://668e540abf9912d4c92dcd67.mockapi.io/Shop/${shopId}`
+        );
+        setShopName(response.data.title);
+      } catch (error) {
+        console.error("Error fetching shop name:", error);
+      }
+    };
+
+    if (shopId) {
+      fetchShopName();
+    }
+  }, [shopId]);
+
+  return <SalesShopOrderContent shopId={shopId} shopName={shopName} />;
 };
 
 export default SalesShopOrder;

@@ -46,13 +46,13 @@ export default function Navbar() {
   const userAvatar = localStorage.getItem("userAvatar");
 
   const menuItems = [
-    {
-      title: "SẢN PHẨM",
-      subItems: [
-        { name: "Danh sách sản phẩm", url: "/Product" },
-        { name: "Tạo mới sản phẩm", url: "/Create" },
-      ],
-    },
+    // {
+    //   title: "SẢN PHẨM",
+    //   subItems: [
+    //     { name: "Danh sách sản phẩm", url: "/Product" },
+    //     { name: "Tạo mới sản phẩm", url: "/Create" },
+    //   ],
+    // },
     {
       title: "DANH SÁCH",
       subItems: [
@@ -65,7 +65,7 @@ export default function Navbar() {
     {
       title: "ĐƠN HÀNG",
       subItems: [
-        { name: "Doanh thu", url: "Cart" },
+        // { name: "Doanh thu", url: "Cart" },
         { name: "Thanh toán", url: "/Payment" },
         { name: "Sản phẩm đã bán", url: "/Cart" },
       ],

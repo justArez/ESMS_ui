@@ -116,7 +116,7 @@ const ShopItem = ({ item, onEdit, onSelect }) => {
       <div className="shop-item-info">
         <div className="shop-item-header">
           <div className="shop-item-name">
-            <p>{title}</p>
+            <p>{title} - SHOP</p>
           </div>
         </div>
         <div className="shop-item-desc">
