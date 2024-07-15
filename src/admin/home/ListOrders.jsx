@@ -523,7 +523,7 @@ const ListOrders = () => {
 
     // Fetch orders from mock API
     axios
-      .get(`https://668e540abf9912d4c92dcd67.mockapi.io/Shop/${shopId}/orders`)
+      .get(`https://668e540abf9912d4c92dcd67.mockapi.io/Shop/1/orders`)
       .then((response) => {
         setOrders(response.data);
       })
