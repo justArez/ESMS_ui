@@ -46,13 +46,13 @@ export default function Navbar() {
   const userAvatar = localStorage.getItem("userAvatar");
 
   const menuItems = [
-    {
-      title: "SẢN PHẨM",
-      subItems: [
-        { name: "Danh sách sản phẩm", url: "/Product" },
-        { name: "Tạo mới sản phẩm", url: "/Create" },
-      ],
-    },
+    // {
+    //   title: "SẢN PHẨM",
+    //   subItems: [
+    //     { name: "Danh sách sản phẩm", url: "/Product" },
+    //     { name: "Tạo mới sản phẩm", url: "/Create" },
+    //   ],
+    // },
     {
       title: "DANH SÁCH",
       subItems: [
