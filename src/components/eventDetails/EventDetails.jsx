@@ -1,73 +1,30 @@
-// import React from "react";
-// import { useParams, useLocation } from "react-router-dom";
-// import sk1 from "../../assets/images/sk1.png";
-// import sk2 from "../../assets/images/sk2.png";
-// import sk3 from "../../assets/images/sk3.png";
-// import sk4 from "../../assets/images/sk4.png";
-// import sk5 from "../../assets/images/sk5.png";
-// import sk6 from "../../assets/images/sk6.png";
-// import "./EventDetails.scss";
-
-// const imageMap = { sk1, sk2, sk3, sk4, sk5, sk6 };
-
-// const EventDetails = () => {
-//   const { id } = useParams();
-//   const { state } = useLocation();
-//   const event = state?.event;
-
-//   if (!event) {
-//     return <div className="flex-center">Event not found</div>;
-//   }
-
-//   return (
-//     <div className="center-container">
-//       <div className="event-details-container">
-//         <div className="event-details-content">
-//           <div className="event-image-container">
-//             <img src={event.image} alt={event.title} className="event-image" />
-//           </div>
-//           <div className="event-info-container">
-//             <h1 className="event-title">{event.title}</h1>
-//             <div className="event-dates">
-//               <p>
-//                 Ngày bắt đầu: <span>{event.startdate}</span>
-//               </p>
-//               <p>
-//                 Ngày kết thúc: <span>{event.enddate || "N/A"}</span>
-//               </p>
-//             </div>
-//             <div className="event-description">
-//               <h2>Thông tin sự kiện</h2>
-//               <p>{event.description}</p>
-//             </div>
-//             <button className="create-order-button">TẠO ĐƠN HÀNG</button>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default EventDetails;
-
-import React, { useState } from "react";
-import { useParams, useLocation } from "react-router-dom";
-import sk1 from "../../assets/images/sk1.png";
-import sk2 from "../../assets/images/sk2.png";
-import sk3 from "../../assets/images/sk3.png";
-import sk4 from "../../assets/images/sk4.png";
-import sk5 from "../../assets/images/sk5.png";
-import sk6 from "../../assets/images/sk6.png";
+import React, { useState, useEffect } from "react";
+import { useParams, useLocation, Link } from "react-router-dom";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { getEventById } from "../../services/eventService";
 import "./EventDetails.scss";
-
-const imageMap = { sk1, sk2, sk3, sk4, sk5, sk6 };
 
 const EventDetails = () => {
   const { id } = useParams();
-  const { state } = useLocation();
+  const location = useLocation();
+  const [event, setEvent] = useState(location.state?.event || null);
   const [activeTab, setActiveTab] = useState("details");
   const [isRegistered, setIsRegistered] = useState(false);
-  const event = state?.event;
+
+  useEffect(() => {
+    if (!event) {
+      const fetchEventDetails = async () => {
+        try {
+          const eventData = await getEventById(id);
+          setEvent(eventData);
+        } catch (error) {
+          console.error("Error fetching event details:", error);
+        }
+      };
+
+      fetchEventDetails();
+    }
+  }, [id, event]);
 
   if (!event) {
     return <div className="flex-center">Event not found</div>;
@@ -79,29 +36,39 @@ const EventDetails = () => {
 
   return (
     <div className="event-details-page">
+      <div className="header w-full flex justify-start">
+        <Link to="/home" className="back-button">
+          <ArrowBackIcon fontSize="large" />
+        </Link>
+      </div>{" "}
       <div className="tab-content">
         {activeTab === "details" && (
-          <div className="details-tab">
-            <div className="event-image-container">
-              <img
-                src={event.image}
-                alt={event.title}
-                className="event-image"
-              />
-            </div>
-            <div className="event-details-container">
-              <h1 className="event-title">{event.title}</h1>
-              <div className="event-dates">
-                <p>
-                  Ngày bắt đầu: <span>{event.startdate}</span>
-                </p>
-                <p>
-                  Ngày kết thúc: <span>{event.enddate || "N/A"}</span>
-                </p>
+          <div>
+            {" "}
+            <div className="details-tab">
+              <div className="event-image-container">
+                <img
+                  src={event.image}
+                  alt={event.eventName}
+                  className="event-image"
+                />
               </div>
-              <div className="event-description">
-                <h2>Thông tin sự kiện</h2>
-                <p>{event.description}</p>
+              <div className="event-details-container">
+                <h1 className="event-title">{event.eventName}</h1>
+                <div className="event-dates">
+                  <p>
+                    Ngày bắt đầu: <span>{event.startDate}</span>
+                  </p>
+                  <p>
+                    Ngày kết thúc: <span>{event.endDate || "N/A"}</span>
+                  </p>
+                </div>
+                <div className="event-description">
+                  <h2>Thông tin sự kiện</h2>
+                  <p>{event.description}</p>
+                  <h2>Chi tiết sự kiện</h2>
+                  <p>{event.details?.information}</p>
+                </div>
               </div>
             </div>
           </div>
