@@ -344,6 +344,17 @@ h-menu {
 //   object-fit: cover;
 // }
 
+.image-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-cell img {
+  max-width: 100px; /* Adjust the max-width as needed */
+  height: auto;
+}
+
 .product1 {
   margin: 0;
   width: 388px;
